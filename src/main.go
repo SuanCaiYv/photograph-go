@@ -18,13 +18,19 @@ type Server struct {
 }
 
 func (s *Server) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	resp.Header().Set("Access-Control-Allow-Origin", "*")
+	resp.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE, HEAD, PATCH")
+	resp.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Accept, Origin, Cache-Control, X-Requested-With")
+	if req.Method == http.MethodOptions {
+		return
+	}
 	path := req.URL.Path
 	if strings.HasPrefix(path, "/list") {
 		s.list(resp, req)
 	} else if strings.HasPrefix(path, "/preview") {
 		s.preview(resp, req)
-	} else if strings.HasPrefix(path, "/download") {
-		s.download(resp, req)
+	} else if strings.HasPrefix(path, "/origin") {
+		s.origin(resp, req)
 	} else {
 		resp.WriteHeader(http.StatusNotFound)
 		return
@@ -65,7 +71,7 @@ func (s *Server) list(resp http.ResponseWriter, req *http.Request) {
 			if size.Width > size.Height {
 				x, y = y, x
 			}
-			a, b := x/600, y/400
+			a, b := x/800, y/600
 			if b > a {
 				a, b = b, a
 			}
@@ -126,8 +132,8 @@ func (s *Server) preview(resp http.ResponseWriter, req *http.Request) {
 	http.ServeFile(resp, req, filepath.Join(s.previewPath, filename))
 }
 
-func (s *Server) download(resp http.ResponseWriter, req *http.Request) {
-	filename := strings.TrimPrefix(req.URL.Path, "/download/")
+func (s *Server) origin(resp http.ResponseWriter, req *http.Request) {
+	filename := strings.TrimPrefix(req.URL.Path, "/origin/")
 	http.ServeFile(resp, req, filepath.Join(s.photosPath, filename))
 }
 
