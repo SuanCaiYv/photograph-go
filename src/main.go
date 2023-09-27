@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 type Server struct {
@@ -38,7 +37,7 @@ func (s *Server) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) list(resp http.ResponseWriter, req *http.Request) {
-	dir := "/tmp/photos-" + time.Now().Format("20060102-15:04:05")
+	dir := "/tmp/photos-preview"
 	if s.previewPath == "" {
 		os.Mkdir(dir, 0755)
 		s.previewPath = dir
